@@ -41,7 +41,7 @@ if [ -f "$rc_file" ]; then
           echo -e "\n# Bind Ctrl+K to a shllm" >> "$rc_file"
           echo "$binding_line" >> "$rc_file"
           echo "Ctrl+K binding added to $rc_file"
-          . "$rc_file"
+          . "$rc_file" > /dev/null 2>&1
      else
           echo "Binding already present in $rc_file"
      fi
