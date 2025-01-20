@@ -8,7 +8,7 @@ Integrate LLM in your shell.
 Copy and paste this line in your shell.
 
 ```bash
-https://raw.githubusercontent.com/soheil/shllm/refs/heads/main/- | . -
+curl https://raw.githubusercontent.com/soheil/shllm/refs/heads/main/- | . -
 ```
 
 Ensure `OPENAI_API_KEY` following env var is set in your shell.
