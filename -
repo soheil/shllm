@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Function to determine the shell configuration file
+get_shell_rc_file() {
+     local shell_name
+     shell_name=$(basename "$SHELL")
+
+     case "$shell_name" in
+          bash)
+                # Check for .bash_profile first, then .bashrc
+                if [ -f "$HOME/.bash_profile" ]; then
+                     echo "$HOME/.bash_profile"
+                elif [ -f "$HOME/.bashrc" ]; then
+                     echo "$HOME/.bashrc"
+                else
+                     echo "No .bash_profile or .bashrc found for bash"
+                     exit 1
+                fi
+                ;;
+          zsh)
+                echo "$HOME/.zshrc"
+                ;;
+          ksh)
+                echo "$HOME/.kshrc"
+                ;;
+          *)
+                echo "Unsupported shell: $shell_name"
+                exit 1
+                ;;
+     esac
+}
+
+binding_line='bind -x "\"\\C-k\":shllm"'
+
+# Determine the right shell configuration file
+rc_file=$(get_shell_rc_file)
+
+# Add the binding line to the shell configuration if not already present
+if [ -f "$rc_file" ]; then
+     if ! grep -Fxq "$binding_line" "$rc_file"; then
+          echo -e "\n# Bind Ctrl+K to a shllm" >> "$rc_file"
+          echo "$binding_line" >> "$rc_file"
+          echo "Ctrl+K binding added to $rc_file"
+          . "$rc_file"
+     else
+          echo "Binding already present in $rc_file"
+     fi
+else
+     echo "Shell configuration file $rc_file not found."
+fi
+
+filename="/usr/local/bin/shllm"
+
+# Use a Heredoc to write the script content to the file
+cat << EOF > "$filename"
+#!/usr/bin/env python3
+
+print(99)
+
+EOF
+
+# Make the script executable
+chmod +x "$filename"
