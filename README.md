@@ -31,7 +31,7 @@ rm *l*l*
 
 ### Add OPENAI_API_KEY
 
-Ensure `OPENAI_API_KEY` following env var is set in your shell.
+Ensure `OPENAI_API_KEY` env var is set in your shell.
 
 e.g. `~/.bash_profile`:
 
