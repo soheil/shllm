@@ -11,20 +11,31 @@ Copy and paste this line in your shell.
 curl https://raw.githubusercontent.com/soheil/shllm/refs/heads/main/- > /tmp/- && . /tmp/-
 ```
 
-Ensure `OPENAI_API_KEY` following env var is set in your shell.
-
-e.g. `~/.bash_profile`:
-
-```bash
-export OPENAI_API_KEY='sk-LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL'
-```
-
 
 ## Usage
 
 `Ctrl + K` or `shllm` and ask LLM the command you would like to run.
 
+```bash
+shllm> ffmpeg input.mp4 keep original encoding and remove the audio
+
+ffmpeg -i input.mp4 -c:v copy -an output.mp4
 ```
-> ffmpeg input.mp4 keep original encoding and remove the audio
+
+```bash
+shllm> delete files that have two l's in their name
+
+rm *l*l*
+```
+
+
+### Add OPENAI_API_KEY
+
+Ensure `OPENAI_API_KEY` following env var is set in your shell.
+
+e.g. `~/.bash_profile`:
+
+```bash
+export OPENAI_API_KEY=
 ```
 
