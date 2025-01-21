@@ -30,10 +30,12 @@ get_shell_rc_file() {
      esac
 }
 
-binding_line='bind -x "\"\\C-k\":shllm"'
+binding_line='bind -x "\"\\C-k\": stty -g > /tmp/stty.now; stty sane; shllm; stty $(cat /tmp/stty.now)"'
 
 # Determine the right shell configuration file
 rc_file=$(get_shell_rc_file)
+
+echo -e "\n\n"
 
 # Add the binding line to the shell configuration if not already present
 if [ -f "$rc_file" ]; then
@@ -50,13 +52,19 @@ else
 fi
 
 filename="/usr/local/bin/shllm"
+filename_core="/usr/local/bin/core_shllm"
 
 # Use a Heredoc to write the script content to the file
-cat << EOF > "$filename"
+cat << 'EOF' > "$filename_core"
 #!/usr/bin/env python3
 
 SHLLM_PYTHON_CODE
 EOF
 
+cat << 'EOF' > "$filename"
+SHLLM_SHELL_CODE
+EOF
+
 # Make the script executable
 chmod +x "$filename"
+chmod +x "$filename_core"

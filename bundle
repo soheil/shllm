@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
-content_sh = open('install').read()
+install_sh = open('install').read()
 content_py = open('shllm.py').read()
-out = content_sh.replace('SHLLM_PYTHON_CODE', content_py)
+content_sh = open('shllm.sh').read()
+
+out = install_sh \
+    .replace('SHLLM_PYTHON_CODE', content_py) \
+    .replace('SHLLM_SHELL_CODE', content_sh)
 
 open('-', 'w').write(out)

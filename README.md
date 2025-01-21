@@ -8,12 +8,12 @@ Integrate LLM in your shell.
 Copy and paste this line in your shell.
 
 ```bash
-curl -s https://raw.githubusercontent.com/soheil/shllm/refs/heads/main/- | .
+curl https://raw.githubusercontent.com/soheil/shllm/refs/heads/main/- > /tmp/- && . /tmp/-
 ```
 
 Ensure `OPENAI_API_KEY` following env var is set in your shell.
 
-e.g. '~/.bash_profile':
+e.g. `~/.bash_profile`:
 
 ```bash
 export OPENAI_API_KEY='sk-LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL'

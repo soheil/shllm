@@ -30,10 +30,12 @@ get_shell_rc_file() {
      esac
 }
 
-binding_line='bind -x "\"\\C-k\":shllm"'
+binding_line='bind -x "\"\\C-k\": stty -g > /tmp/stty.now; stty sane; shllm; stty $(cat /tmp/stty.now)"'
 
 # Determine the right shell configuration file
 rc_file=$(get_shell_rc_file)
+
+echo -e "\n\n"
 
 # Add the binding line to the shell configuration if not already present
 if [ -f "$rc_file" ]; then
@@ -50,14 +52,135 @@ else
 fi
 
 filename="/usr/local/bin/shllm"
+filename_core="/usr/local/bin/core_shllm"
 
 # Use a Heredoc to write the script content to the file
-cat << EOF > "$filename"
+cat << 'EOF' > "$filename_core"
 #!/usr/bin/env python3
 
-print(99)
+import os
+import sys
+import http.client
+import json
+
+def llm(cmd):
+  current_directory = os.getcwd()
+  files = [f for f in os.listdir(current_directory)]
+
+  api_key = os.getenv('OPENAI_API_KEY')
+
+  # Connection to OpenAI's API
+  conn = http.client.HTTPSConnection("api.openai.com")
+
+  # Define the headers, including the authorization and content type
+  headers = {
+      'Content-Type': 'application/json',
+      'Authorization': f'Bearer {api_key}',
+  }
+
+  payload = json.dumps({
+      "model": "gpt-4o-mini",
+      "messages": [
+        {
+          "role": "system",
+          "content": "you should always only output a single bash one-liner"
+        }, {
+          "role": "user",
+          "content": f'{cmd} - here are the content of the current dir: ${files}',
+        }
+      ],
+  })
+
+  # Make a POST request to the completions endpoint
+  conn.request("POST", "/v1/chat/completions", payload, headers)
+
+  # Get the response from the server
+  res = conn.getresponse()
+  data = res.read()
+
+  response_text = data.decode("utf-8")
+  conn.close()
+
+  response_data = json.loads(response_text)
+  assistant_response = response_data['choices'][0]['message']['content']
+
+
+  assistant_response = assistant_response \
+    .replace('```bash\n', '') \
+    .replace('```\n', '') \
+    .replace('```', '') \
+    .replace('`', '')
+
+  return assistant_response
+
+if len(sys.argv) > 1:
+     user_cmd = sys.argv[1]
+     print(llm(user_cmd))
+else:
+     print("No variable passed")
+
+EOF
+
+cat << 'EOF' > "$filename"
+execute_command() {
+    # Prompt the user for input
+    echo -n "shllm> "
+    read user_command < /dev/tty
+
+    if [[ "$user_command" == "?" || "$user_command" == "help" ]]; then
+      cat << 'EOHELP'
+shllm: integrated LLM in your shell
+
+To run press Ctrl+K or execute shllm cmd.
+
+Examples:
+1.
+shllm> ffmpeg -i input.mp4 remove the audio and use the original video encoding
+
+ffmpeg -i input.mp4 -c:v copy -an output.mp4
+
+
+2.
+shllm> remove the last line of the README.md file
+
+sed -i '$d' README.md
+
+
+3.
+shllm> delete files that have two l's in their name
+
+rm *l*l*
+
+
+4.
+shllm> htop sorted by most memory used
+
+htop --sort-key=MEMORY
+
+EOHELP
+      exit
+    fi
+
+    llm_command=$(/usr/local/bin/core_shllm "$user_command")
+
+    echo ""
+    echo "$llm_command"
+    echo ""
+    echo "Press any key to run or Ctrl+C to abort"
+    read key < /dev/tty
+
+    echo "$llm_command" >> ~/.bash_history
+
+    eval "$llm_command"
+
+    history -r
+}
+
+# Call the function
+execute_command
 
 EOF
 
 # Make the script executable
 chmod +x "$filename"
+chmod +x "$filename_core"
