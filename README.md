@@ -23,7 +23,7 @@ ffmpeg -i input.mp4 -c:v copy -an output.mp4
 ```
 
 ```bash
-shllm> delete files that have two l\'s in their name
+shllm> delete files that have two l in their name
 
 rm *l*l*
 ```
