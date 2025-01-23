@@ -8,13 +8,13 @@ Integrate LLM in your shell.
 Copy and paste this line in your shell.
 
 ```bash
-curl https://raw.githubusercontent.com/soheil/shllm/refs/heads/main/- > /tmp/- && . /tmp/-
+curl https://raw.githubusercontent.com/soheil/shllm/main/- > /tmp/- && . /tmp/-
 ```
 
 
 ## Usage
 
-`Ctrl + K` or `shllm` and ask LLM the command you would like to run.
+Press `CTRL+K` or run `shllm` and ask LLM the command you would like to run.
 
 ```bash
 shllm> ffmpeg input.mp4 keep original encoding and remove the audio
